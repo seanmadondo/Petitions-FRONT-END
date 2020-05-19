@@ -2,6 +2,11 @@ import Vue from 'vue'
 import App from './App.vue'
 import Home from './Home.vue';
 import Petitions from './Petitions.vue';
+import Petition from './Petition.vue';
+
+/*import Vuetify from 'vuetify';
+Vue.use(Vuetify);
+import 'vuetify/dist/vuetify.min.css' */
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -17,6 +22,11 @@ const routes = [
     path: "/",
     name: "home",
     component: Home
+  },
+  {
+    path: "/petitions/:petition_id",
+    name: "petition",
+    component: Petition
   },
   {
     path: "/petitions",
