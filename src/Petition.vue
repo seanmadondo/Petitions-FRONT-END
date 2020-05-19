@@ -8,7 +8,7 @@
     <!-- Display a single petition-->
     <div v-if="$route.params.petition_id">
       <div id="petition">
-        <router-link :to="{ name: 'petitions' }"> Back to Petitions </router-link>
+        <v-btn> <router-link :to="{ name: 'petitions' }"> Back to Petitions </router-link> </v-btn>
         <br /><br />
 
         <table>
@@ -30,18 +30,19 @@
           <br/>
           <tr> <td>Closing Date <br/>{{ onePetition.closingDate }} </td></tr>
           <br/>
+          <!-- TODO: Get the hero image -->
 
         </table>
-
-        Signatures
-        <tr v-for="signature in petitionSignatures">
-          <td> {{signature.name }}</td>
-          <td> {{ signature.city }}</td>
-          <td> {{signature.country }}</td>
-          <td> {{signature.signedDate }}</td>
-          <br/>
-        </tr>
-
+        <table>
+          Signatures
+          <tr v-for="signature in petitionSignatures">
+            <td> {{signature.name }}</td>
+            <td> {{ signature.city }}</td>
+            <td> {{signature.country }}</td>
+            <td> {{signature.signedDate }}</td>
+            <br/>
+          </tr>
+        </table>
 
       </div>
     </div>
@@ -77,7 +78,7 @@
       },
       //Get the list of signatures for the currently listed petition
       getPetitionSignatures: function(id) {
-        this.$http.get('http://localhost:4941/api/v1/petitions/' + id + 'signatures')
+        this.$http.get('http://localhost:4941/api/v1/petitions/' + id + '/signatures')
           .then((response) => {
             this.petitionSignatures = response.data;
           })

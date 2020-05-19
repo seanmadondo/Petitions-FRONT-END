@@ -4,9 +4,16 @@ import Home from './Home.vue';
 import Petitions from './Petitions.vue';
 import Petition from './Petition.vue';
 
-/*import Vuetify from 'vuetify';
+import VueCookie from 'vue-cookie';
+Vue.use(VueCookie);
+
+import VueImg from 'v-img'
+Vue.use(VueImg)
+
+//Vuetify CSS
+import Vuetify from 'vuetify';
+import 'vuetify/dist/vuetify.min.css'
 Vue.use(Vuetify);
-import 'vuetify/dist/vuetify.min.css' */
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -44,6 +51,7 @@ const router = new VueRouter({
 
 new Vue({
   el: '#app',
+  vuetify : new Vuetify(),
   router: router,
   render: h => h(App)
-})
+});

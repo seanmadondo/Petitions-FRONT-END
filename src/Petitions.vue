@@ -9,27 +9,32 @@
         </div>
 
           <div id="petitions">
-            <table>g
+            <table>
+              <tr>
+
+
+              </tr>
+            </table>
+
+            <table>
               <tr v-for="petition in petitions">
-                <td>{{ petition.title }}</td>
-                <td>{{ petition.category }}</td>
-                <td>{{ petition.authorName }}</td>
-                <td>{{ petition.signatureCount}}</td>
-                <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}">View</router-link></td>
+                <br/> <td>{{ petition.title }}</td>
+                <br/><td>{{ petition.category }}</td>
+                <br/><td>{{ petition.authorName }}</td>
+                <br/><td>{{ petition.signatureCount }}</td>
+                <br/> <v-btn> <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}">View</router-link></td> </v-btn>
                 <br ></br >
 
-                <!-- TODO Find out how to get the image
-                <td>
+                <!--<td>
                   <v-img
-                    :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo/'"
-                    :lazy-src="'/images/Default.jpg'"
+                    :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'"
+                    :lazy-src="'./assets/logo.jpg'"
                     alt="No Photo"
                     height="300"
                     width="300"
                   >
                   </v-img>
-                </td>
-                -->
+                </td> -->
 
               </tr>
             </table>
