@@ -9,10 +9,12 @@
         </div>
 
           <div id="petitions">
+
             <table>
               <tr>
-
-
+                <div v-if="this.$cookies.get('authToken')">
+                  <br/> <v-btn> <td><router-link :to="{ home: 'petitions'}"> Logout </router-link></td> </v-btn>
+                </div>
               </tr>
             </table>
 
