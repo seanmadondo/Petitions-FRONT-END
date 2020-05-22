@@ -8,7 +8,7 @@
       <a>  <td><router-link :to="{ name: 'petitions'}"> Browse Petitions </router-link></td>  </a>
       <br/><br/>
 
-      <div>
+      <div v-if="checkLoggedIn()===false">
         <a type="button" href="#register" class="btn btn-primary" data-toggle="modal" data-target="#registerUserModal"> Register </a>
         <br/><br/>
         <a type="button" href="#login" class="btn btn-info btn-lg" data-toggle="modal" data-target="#loginModal"> Login </a>
@@ -16,7 +16,7 @@
 
       <!-- User logout button -->
       <br/><br/>
-      <div>
+      <div v-if="checkLoggedIn()===true" class="logoutButton">
         <a type="button" v-on:click="logoutUser()"> Logout </a>
       </div>
 
@@ -271,6 +271,7 @@
             return;
           } else {
             var loginJsonData = {};
+            var name = this.firstName + " " + this.lastName;
             loginJsonData["email"] = this.email;
             loginJsonData["password"] = this.password;
             this.$http.post('http://localhost:4941/api/v1/users/login', loginJsonData,
@@ -285,6 +286,14 @@
               this.error = error;
               this.errorFlag = true;
             });
+          }
+        },
+
+        checkLoggedIn: function () {
+          if (localStorage.getItem("authId")  && localStorage.getItem("authToken")) {
+            return true;
+          } else {
+            return false;
           }
         }
       }

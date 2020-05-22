@@ -6,7 +6,6 @@
     <div class="navbar"></div>
     <router-view></router-view>
 
-
   </div>
 
 </template>

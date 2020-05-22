@@ -16,8 +16,47 @@
         <div class="HomePage">
           <br>
           <a type="button" href="#Create" class="btn btn-info btn-lg" data-toggle="modal" data-target="#CreatePetitionModal"> Create a Petition </a>
-          <a type="button" href="#View" class="btn btn-info btn-lg" data-toggle="modal" data-target="#ViewModal"> View My Petitions </a>
+          <a type="button" href="#View" class="btn btn-info btn-lg" data-toggle="modal" data-target="#ViewPetitionModal"> View My Petitions </a>
         </div>
+
+        <!-- Modal to view my petitions-->
+        <div id="ViewPetitionModal" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class = modal-header>
+                <h5 class="modal-title" id="deleteUserModalLabel">View My Petitions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+              </div>
+              <div class="modal-body">
+                <h3> All your petitions </h3>
+                <div id="myPetitions">
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                      <tr>
+                        <th class="text-left">Title</th>
+                        <th class="text-left">Category</th>
+                        <th class="text-left">Signatures</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr v-for="petition in petitions">
+                        <td>{{ petition.title }}</td>
+                        <td>{{ petition.category }}</td>
+                        <td>{{ petition.signatureCount }}</td>
+                        <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}">View</router-link></td>
+                      </tr>
+                      </tbody>
+
+                    </template>
+                  </v-simple-table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         <!--Modal to create a Petition-->
         <div id="CreatePetitionModal" class="modal fade" role="dialog">
@@ -28,7 +67,7 @@
                 <h5 class="modal-title" id="loginUserModalLabel"> Create a New Petition </h5>
               </div>
               <div class="modal-body">
-                <h1>Petition Details</h1>
+                <h3>Petition Details</h3>
                 <v-app id="inspire">
                   <v-alert v-if="errorFlag" color="error" icon="warning" value="true">
                     {{error}}
@@ -90,6 +129,7 @@
 
         <br></br>
 
+          <!-- Display all the petitions -->
           <div id="petitions">
             <v-simple-table>
               <template v-slot:default>
@@ -136,13 +176,13 @@
         categoryNames: [],
         categoryDict: {},
         selectedCategory: [],
-        createdPetitionId: ''
+        myPetitionsList: [],
       }
     },
     mounted: function() {
       this.getPetitions();
       this.getCategories();
-      console.log(this.categoryDict);
+      this.getMyPetitions();
     },
     methods: {
       //get all the petitions
@@ -181,7 +221,10 @@
 
         this.$http.post('http://localhost:4941/api/v1/petitions', jsonPetition,
           {headers:{'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
-        .then((response) => {this.createdPetitionId = response.data.petitionId})
+        .then((response) => {
+          $('#CreatePetitionModal').modal('hide');
+          location.reload();
+        })
         .catch((error) => {
           this.error = error;
           this.errorFlag = true;
@@ -199,6 +242,19 @@
           }
         })
         .catch((error) => { this.error = error; this.errorFlag = true; });
+      },
+
+      getMyPetitions: function() {
+        this.$http.get('http://localhost:4941/api/v1/petitions')
+        .then((response) => {
+          for (var i = 0; i < response.data.length; i++) {
+
+          }
+        })
+        .catch((error) => {
+          this.error = error;
+          this.errorFlag = true;
+        });
       }
     }
   }
