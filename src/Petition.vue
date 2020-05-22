@@ -1,14 +1,14 @@
 <template>
-  <div>
+  <div class="petitionView">
 
     <div v-if="errorFlag" style="color: red;">
       {{ error }}
     </div>
 
     <!-- Display a single petition-->
-    <div v-if="$route.params.petition_id">
+    <div v-if="$route.params.petition_id" >
       <div id="petition">
-        <v-btn> <router-link :to="{ name: 'petitions' }"> Back to Petitions </router-link> </v-btn>
+        <router-link :to="{ name: 'petitions' }" style="color: white;"> Back to Petitions </router-link>
         <br /><br />
 
         <table>
@@ -93,5 +93,12 @@
 
 
 <style scoped>
+
+  .petitionView {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+    text-align: center
+  }
 
 </style>
