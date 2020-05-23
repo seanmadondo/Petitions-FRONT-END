@@ -13,18 +13,38 @@
           <a> <router-link :to="{ name: 'home' }"> Home </router-link></a>
         </div>
 
-        <div class="HomePage">
+        <!--========= User only able to Create and View petitions when logged in ======================= -->
+        <div class="HomePage" v-if="checkLoggedIn()===true">
           <br>
           <a type="button" href="#Create" class="btn btn-info btn-lg" data-toggle="modal" data-target="#CreatePetitionModal"> Create a Petition </a>
           <a type="button" href="#View" class="btn btn-info btn-lg" data-toggle="modal" data-target="#ViewPetitionModal"> View My Petitions </a>
         </div>
 
+        <div class="HomePage" v-if="checkLoggedIn()===false">
+          <br>
+          <a type="button" href="#Create" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signInModal"> Create a Petition </a>
+          <a type="button" href="#View" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signInModal"> View My Petitions </a>
+        </div>
+
+        <!-- Modal to request user to sign in first -->
+        <div id="signInModal" class="modal fade" role="dialog">
+          <template>
+            <v-card>
+              <v-card-title class="headline"> Authentication Required - Please login in to use this feature </v-card-title>
+              <v-card-text>
+                <a> <router-link :to="{ name: 'home' }" onclick="location.reload()" > Take me there </router-link> </a>
+              </v-card-text>
+            </v-card>
+          </template>
+        </div>
+
+
         <!-- Modal to view my petitions-->
-        <div id="ViewPetitionModal" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div id="ViewPetitionModal" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="ViewPetitionModal" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class = modal-header>
-                <h5 class="modal-title" id="deleteUserModalLabel">View My Petitions</h5>
+                <h5 class="modal-title" id="ViewPetitionModalLabel">View My Petitions</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span></button>
               </div>
@@ -41,11 +61,11 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <tr v-for="petition in petitions">
+                      <tr v-for="petition in myPetitionsList">
                         <td>{{ petition.title }}</td>
                         <td>{{ petition.category }}</td>
                         <td>{{ petition.signatureCount }}</td>
-                        <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}">View</router-link></td>
+                        <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}" onclick="location.reload()">View</router-link></td>
                       </tr>
                       </tbody>
 
@@ -103,11 +123,25 @@
                     </template>
 
 
-                    <v-text-field
-                      v-model="closingDate"
-                      label="Closing Date e.g 2020-12-12 (OPTIONAL)"
-                      required
-                    />
+                    <template>
+                      <v-label justify="centre">
+                        Closing Date (Optional)
+                      </v-label>
+                      <v-row justify="space-around">
+                        <v-date-picker
+                          v-model="picker"
+                          color="green lighten-1"
+                          header-color="primary">
+                        </v-date-picker>
+                      </v-row>
+                    </template>
+
+
+<!--                    <v-text-field-->
+<!--                      v-model="closingDate"-->
+<!--                      label="Closing Date e.g 2020-12-12 (OPTIONAL)"-->
+<!--                      required-->
+<!--                    />-->
 
                     <v-btn
                       color="success"
@@ -177,12 +211,15 @@
         categoryDict: {},
         selectedCategory: [],
         myPetitionsList: [],
+        todaysDate: '',
       }
     },
     mounted: function() {
       this.getPetitions();
       this.getCategories();
       this.getMyPetitions();
+      this.getDateToday();
+
     },
     methods: {
       //get all the petitions
@@ -218,6 +255,8 @@
         jsonPetition["title"] = this.title;
         jsonPetition["description"] = this.description;
         jsonPetition["categoryId"] = this.categoryDict[this.selectedCategory];
+        jsonPetition["closingDate"] = this.picker;
+
 
         this.$http.post('http://localhost:4941/api/v1/petitions', jsonPetition,
           {headers:{'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
@@ -245,16 +284,35 @@
       },
 
       getMyPetitions: function() {
-        this.$http.get('http://localhost:4941/api/v1/petitions')
+        this.$http.get('http://localhost:4941/api/v1/petitions',
+          {params:{'authorId': localStorage.getItem("authId"), 'Content-Type': 'application/json'}})
         .then((response) => {
-          for (var i = 0; i < response.data.length; i++) {
-
-          }
+          this.myPetitionsList = response.data;
         })
         .catch((error) => {
           this.error = error;
           this.errorFlag = true;
         });
+      },
+      getDateToday: function() {
+        var today = new Date();
+        this.todaysDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      },
+
+      //Check user is logged in to use functions
+      checkLoggedIn: function () {
+        if (localStorage.getItem("authId") && localStorage.getItem("authToken")) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      viewPetAuthDataTarget: function() {
+        if (this.checkLoggedIn() === true){
+          $('#ViewPetitionModal').modal('show');
+        } else {
+          $('#signInModal').modal('show');
+        }
       }
     }
   }

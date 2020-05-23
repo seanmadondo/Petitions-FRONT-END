@@ -1,7 +1,7 @@
 <template>
 
   <div id="app" style="overflow: hidden">
-    <h1 class="title" style="color:White" > Petitions @ UC </h1>
+    <h1 class="title" style="color:White" > PetitionHub </h1>
 
     <div class="navbar"></div>
     <router-view></router-view>
