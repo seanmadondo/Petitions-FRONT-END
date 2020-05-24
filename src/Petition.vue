@@ -1,5 +1,5 @@
 <template>
-  <div class="petitionView">
+  <div>
 
     <div v-if="errorFlag" style="color: red;">
       {{ error }}
@@ -7,9 +7,54 @@
 
     <!-- Display a single petition-->
     <div v-if="$route.params.petition_id" >
-      <div>
+      <div class="petitionView">
         <router-link :to="{ name: 'petitions' }" style="color: white;"> Back to Petitions </router-link>
         <br /><br />
+      </div>
+
+      <div class="petitionPage" v-if="checkLoggedIn()===true">
+        <div>
+          <a type="button" href="#Sign" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signPetitionModal"
+             v-on:click="signPetition($route.params.petition_id)"> Sign This Petition
+          </a>
+        </div>
+        <div>
+          <a type="button" href="#Remove" class="btn btn-info btn-lg" data-toggle="modal" data-target="#removePetitionModal"> Remove My Signature </a>
+        </div>
+        <br /><br />
+      </div>
+
+      <div class="petitionPage" v-if="checkLoggedIn()===false">
+        <a type="button" href="#Sign" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signInModal"> Sign This Petition </a>
+        <br /><br />
+      </div>
+
+      <!-- Modal to request user to sign in first -->
+      <div id="signInModal" class="modal fade" role="dialog">
+        <template>
+          <v-card>
+            <v-card-title class="headline"> Authentication Required - Please login in to use this feature </v-card-title>
+            <v-card-text>
+              <a> <router-link :to="{ name: 'home' }" onclick="location.reload()" > Take me there </router-link> </a>
+            </v-card-text>
+          </v-card>
+        </template>
+      </div>
+
+      <!--Modal to confirm signing of petition-->
+      <div id="signPetitionModal" class="modal fade" role="dialog">
+        <template>
+          <v-card>
+            <v-card-title class="headline"> NOTICE </v-card-title>
+            <v-card-text> You have successfully signed this Petition </v-card-text>
+            <v-card-actions>
+              <v-btn color="green darken-1" onclick="location.reload()"> OK </v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </div>
+
+      <div class="petitionView">
 
         <table>
           <tr> <td>Petition Title <br/> {{ onePetition.title }}  </td></tr>
@@ -45,10 +90,10 @@
             <template v-slot:default>
               <thead>
               <tr>
-                <th class="text-left">Name</th>
-                <th class="text-left">City</th>
-                <th class="text-left">Country</th>
-                <th class="text-left">Date Signed</th>
+                <th class="text-center">Name</th>
+                <th class="text-center">City</th>
+                <th class="text-center">Country</th>
+                <th class="text-center">Date Signed</th>
               </tr>
               </thead>
               <tbody>
@@ -79,7 +124,7 @@
         error: "",
         errorFlag: false,
         onePetition: [],
-        petitionSignatures: []
+        petitionSignatures: [],
       }
     },
     mounted: function() {
@@ -108,7 +153,38 @@
             this.error = error;
             this.errorFlag = true;
           });
-      }
+      },
+
+      signPetition: function(id) {
+        this.$http.post('http://localhost:4941/api/v1/petitions/' + id + '/signatures', {},
+          {headers: {'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
+          .then((response) => {
+          })
+          .catch((error) => {
+            this.error = error;
+            this.errorFlag = true;
+          });
+      },
+
+      checkLoggedIn: function () {
+        if (localStorage.getItem("authId") && localStorage.getItem("authToken")) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+
+      // checkSignedPetition: function () {
+      //   //function to return true if a user has already signed a petition
+      //   //else return false
+      //   for (let i = 0; i < this.petitionSignatures.length; i++) {
+      //     if (this.petitionSignatures[i].signatoryId === localStorage.getItem("authId")) {
+      //       return true;
+      //     } else {
+      //       return false;
+      //     }
+      //   }
+      //}
     }
   }
 </script>
@@ -120,6 +196,11 @@
     margin: auto;
     width: 50%;
     padding: 10px;
+    text-align: center
+  }
+
+  .petitionPage {
+    margin: auto;
     text-align: center
   }
 

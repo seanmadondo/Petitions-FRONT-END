@@ -173,6 +173,7 @@
                   <th class="text-left">Category</th>
                   <th class="text-left">Author's Name</th>
                   <th class="text-left">Signatures</th>
+                  <th class="text-left">View Link</th>
                 </tr>
                 </thead>
                 <tbody>
