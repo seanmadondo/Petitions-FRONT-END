@@ -1,8 +1,8 @@
 <template>
 
-  <div id="app" style="overflow: hidden">
-    <h1 class="title" style="color:White" > PetitionHub </h1>
 
+  <div id="app" style="overflow: hidden">
+    <h1 class="title" style="color:White" > iPetition UC </h1>
     <div class="navbar"></div>
     <router-view></router-view>
 
@@ -29,6 +29,8 @@
     font-family: "Times New Roman", Georgia, serif;
     font-weight: 900;
   }
+
+
 
 
   .navbar {

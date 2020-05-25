@@ -8,27 +8,28 @@
     <!-- Display a single petition-->
     <div v-if="$route.params.petition_id" >
       <div class="petitionView">
-        <router-link :to="{ name: 'petitions' }" style="color: white;"> Back to Petitions </router-link>
+        <router-link :to="{ name: 'petitions' }" style="color: orange;"> Back to Petitions </router-link>
         <br /><br />
       </div>
 
+      <!-- if this user is logged in, give access to the sign and remove signature buttons -->
       <div class="petitionPage" v-if="checkLoggedIn()===true">
-        <div>
+        <div v-if="checkPetitionSigned()===false">
           <a type="button" href="#Sign" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signPetitionModal"
              v-on:click="signPetition($route.params.petition_id)"> Sign This Petition
           </a>
         </div>
-        <div>
+        <div v-if="checkPetitionSigned()===true">
           <a type="button" href="#Remove" class="btn-danger btn-info btn-lg" data-toggle="modal" data-target="#removeSignModal"
              v-on:click="removeSignature($route.params.petition_id)"> Remove My Signature </a>
         </div>
         <br /><br />
       </div>
-
       <div class="petitionPage" v-if="checkLoggedIn()===false">
         <a type="button" href="#Sign" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signInModal"> Sign This Petition </a>
         <br /><br />
       </div>
+      <!-------------------------------------------------------------------------------------------------------------->
 
       <!-- Modal to request user to sign in first -->
       <div id="signInModal" class="modal fade" role="dialog">
@@ -71,7 +72,7 @@
 
       <div class="petitionView">
 
-        <table>
+        <table style="margin-left:auto;margin-right:auto;" >
           <tr> <td> <img style="width:400px" :src="'http://localhost:4941/api/v1/petitions/' + $route.params.petition_id + '/photo'" >   </td></tr>
           <tr> <td>  <h4>{{ onePetition.title }} </h4>  ({{ onePetition.category }}) </td></tr>
           <v-divider></v-divider>
@@ -129,6 +130,7 @@
   </div>
 </template>
 
+
 <script>
   export default {
     data (){
@@ -143,7 +145,9 @@
     mounted: function() {
       this.getOnePetition(this.$route.params.petition_id);
       this.getPetitionSignatures(this.$route.params.petition_id);
+      this.checkPetitionSigned();
     },
+
     methods: {
       //Get a single petition from the database
       getOnePetition: function(id) {
@@ -196,19 +200,16 @@
              this.error = error;
              this.errorFlag = true;
            });
-       }
+       },
 
-      // checkSignedPetition: function () {
-      //   //function to return true if a user has already signed a petition
-      //   //else return false
-      //   for (let i = 0; i < this.petitionSignatures.length; i++) {
-      //     if (this.petitionSignatures[i].signatoryId === localStorage.getItem("authId")) {
-      //       return true;
-      //     } else {
-      //       return false;
-      //     }
-      //   }
-      //}
+      checkPetitionSigned: function() {
+        for (var i = 0; i < this.petitionSignatures.length; i++) {
+          if (parseInt(this.petitionSignatures[i].signatoryId) === parseInt(localStorage.getItem('authId'))) {
+            return true;
+          }
+        }
+        return false;
+      }
     }
   }
 </script>

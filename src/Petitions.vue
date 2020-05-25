@@ -248,7 +248,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="petition in petitions">
-                    <td> <img style="width:400px" :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'"> </td>
+                    <td><img style="width:400px" :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'"> </td>
                     <td>{{ petition.title }}</td>
                     <td>{{ petition.category }}</td>
                     <td>{{ petition.authorName }}</td>
