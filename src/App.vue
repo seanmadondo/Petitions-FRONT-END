@@ -26,13 +26,13 @@
     font-size: 30px;
     padding-left: 50px;
     padding-top: 25px;
-    font-family: Avantgarde, TeX Gyre Adventor, URW Gothic L, sans-serif;
+    font-family: "Times New Roman", Georgia, serif;
     font-weight: 900;
   }
 
 
   .navbar {
-    background-color: dodgerblue;
+    background-color: steelblue;
     position: absolute; /* Set the nav bar to fixed position */
     top: 0; /* Position the nav bar at the top of the page */
     width: 100%;

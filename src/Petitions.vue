@@ -8,6 +8,7 @@
           {{ error }}
         </div>
 
+
         <div class="HomePage">
           <br>
           <a> <router-link :to="{ name: 'home' }"> Home </router-link></a>
@@ -24,6 +25,69 @@
           <br>
           <a type="button" href="#Create" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signInModal"> Create a Petition </a>
           <a type="button" href="#View" class="btn btn-info btn-lg" data-toggle="modal" data-target="#signInModal"> View My Petitions </a>
+        </div>
+
+        <div class="HomePage">
+          <br>
+          <a type="button"  data-toggle="modal" data-target="#filterOptionsModal"> Filter Options </a>
+        </div>
+
+        <!-- Modal to search for petitions -->
+        <div id="filterOptionsModal" class="modal fade" role="dialog">
+          <template>
+            <v-card>
+              <v-card-title class="headline"> Filter Petitions </v-card-title>
+              <v-card-text>
+                <v-text-field v-model="searchString" label="Search for a petition with a specific title"> </v-text-field>
+              </v-card-text>
+
+<!--              <v-app>-->
+<!--                <template>-->
+<!--                  <v-container fluid>-->
+<!--                    <v-row align="center">-->
+<!--                      <v-select-->
+<!--                        v-model="filterCategory"-->
+<!--                        :items="categoryNames"-->
+<!--                        label="Choose a Category"-->
+<!--                      >-->
+<!--                      </v-select>-->
+<!--                    </v-row>-->
+<!--                  </v-container>-->
+<!--                </template>-->
+<!--              </v-app>-->
+
+              <v-card-actions>
+                <a type="button" class="btn btn-info btn-lg" v-on:click="searchPetitions(searchString)"> Filter </a>
+              </v-card-actions>
+              <div>
+                <v-simple-table>
+                  <template v-slot:default>
+                    <thead>
+                    <tr>
+                      <th class="text-left">Title</th>
+                      <th class="text-left">Category</th>
+                      <th class="text-left">Author's Name</th>
+                      <th class="text-left">Signatures</th>
+                      <th class="text-left">View Link</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="petition in filteredPetitions">
+                      <td>{{ petition.title }}</td>
+                      <td>{{ petition.category }}</td>
+                      <td>{{ petition.authorName }}</td>
+                      <td>{{ petition.signatureCount }}</td>
+                      <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}" onclick="location.reload()">View</router-link></td>
+                    </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </div>
+              <v-card-actions>
+                <button type="button" class="close" data-dismiss="modal" onclick="location.reload()">&times;</button>
+              </v-card-actions>
+            </v-card>
+          </template>
         </div>
 
         <!-- Modal to request user to sign in first -->
@@ -50,6 +114,7 @@
               </div>
               <div class="modal-body">
                 <h3> All your petitions </h3>
+
                 <div id="myPetitions">
                   <v-simple-table>
                     <template v-slot:default>
@@ -66,6 +131,7 @@
                         <td>{{ petition.category }}</td>
                         <td>{{ petition.signatureCount }}</td>
                         <td><router-link :to="{ name: 'petition', params: { petition_id: petition.petitionId }}" onclick="location.reload()">View</router-link></td>
+                        <td> <a type="button" class="btn-danger btn-lg" v-on:click="deletePetition(petition.petitionId)"> Delete </a> </td>
                       </tr>
                       </tbody>
 
@@ -124,12 +190,13 @@
 
 
                     <template>
-                      <v-label justify="centre">
+                      <v-label justify="text-centre">
                         Closing Date (Optional)
                       </v-label>
+                      <br/><br/>
                       <v-row justify="space-around">
                         <v-date-picker
-                          v-model="picker"
+                          v-model="petitionCloseDate"
                           color="green lighten-1"
                           header-color="primary">
                         </v-date-picker>
@@ -143,6 +210,7 @@
 <!--                      required-->
 <!--                    />-->
 
+                    <br/><br/>
                     <v-btn
                       color="success"
                       type="submit"
@@ -165,19 +233,22 @@
 
           <!-- Display all the petitions -->
           <div id="petitions">
+
             <v-simple-table>
               <template v-slot:default>
                 <thead>
                 <tr>
+                  <th class="text-left"></th>
                   <th class="text-left">Title</th>
                   <th class="text-left">Category</th>
                   <th class="text-left">Author's Name</th>
                   <th class="text-left">Signatures</th>
-                  <th class="text-left">View Link</th>
+                  <th class="text-left">View</th>
                 </tr>
                 </thead>
                 <tbody>
                   <tr v-for="petition in petitions">
+                    <td> <img style="width:400px" :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'"> </td>
                     <td>{{ petition.title }}</td>
                     <td>{{ petition.category }}</td>
                     <td>{{ petition.authorName }}</td>
@@ -213,6 +284,10 @@
         selectedCategory: [],
         myPetitionsList: [],
         todaysDate: '',
+        searchString: '',
+        filteredPetitions:[],
+        filterCategory: '',
+        petitionCloseDate:''
       }
     },
     mounted: function() {
@@ -256,17 +331,23 @@
         jsonPetition["title"] = this.title;
         jsonPetition["description"] = this.description;
         jsonPetition["categoryId"] = this.categoryDict[this.selectedCategory];
-        jsonPetition["closingDate"] = this.picker;
+
+        if (this.petitionCloseDate === '') {
+          //DO nothing
+        } else {
+          jsonPetition["closingDate"] = this.petitionCloseDate;
+        }
 
 
         this.$http.post('http://localhost:4941/api/v1/petitions', jsonPetition,
           {headers:{'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
         .then((response) => {
+          this.signPetition(localStorage.getItem("authId")); //Sign your petition straight away
           $('#CreatePetitionModal').modal('hide');
           location.reload();
         })
         .catch((error) => {
-          this.error = error;
+          this.error = "Please enter a date that is in the future!";
           this.errorFlag = true;
         });
       },
@@ -308,12 +389,40 @@
           return false;
         }
       },
-      viewPetAuthDataTarget: function() {
-        if (this.checkLoggedIn() === true){
-          $('#ViewPetitionModal').modal('show');
-        } else {
-          $('#signInModal').modal('show');
-        }
+
+      searchPetitions: function(string){
+        this.$http.get('http://localhost:4941/api/v1/petitions',
+          {params:{'q': string, 'Content-Type': 'application/json'}})
+          .then((response) => {
+            this.filteredPetitions = response.data;
+          })
+          .catch((error) => {
+            this.error = error;
+            this.errorFlag = true;
+          });
+      },
+
+      signPetition: function(id) {
+        this.$http.post('http://localhost:4941/api/v1/petitions/' + id + '/signatures', {},
+          {headers: {'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
+          .then((response) => {
+          })
+          .catch((error) => {
+            this.error = error;
+            this.errorFlag = true;
+          });
+      },
+
+      deletePetition: function(id) {
+        this.$http.delete('http://localhost:4941/api/v1/petitions/' + id,
+          {headers: {'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
+          .then((response) => {
+            location.reload();
+          })
+          .catch((error) => {
+            this.error = error;
+            this.errorFlag = true;
+          });
       }
     }
   }

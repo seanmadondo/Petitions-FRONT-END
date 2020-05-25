@@ -188,20 +188,25 @@
 
           //Check first name and last name are valid
           if (this.firstName === '') {
-            alert("Your First Name is required!")
+            alert("Your First Name is required!");
+            return;
           }
           if (this.lastName === '') {
-            alert("Your last name is required!")
+            alert("Your last name is required!");
+            return;
           }
           //Execute email checks
           if (this.email === '') {
-            alert("Your email is required!")
+            alert("Your email is required!");
+            return;
           }
           if (this.password === '') {
-            alert("Please type in a password!")
+            alert("Please type in a password!");
+            return;
           }
           if (this.password !== this.retypePassword){
-            alert("Your passwords don't match!")
+            alert("Your passwords don't match!");
+            return;
           }
           else {
             var jsonData = {};
@@ -227,7 +232,7 @@
                 this.$router.push('/petitions');
                 $('#registerUserModal').modal('hide');
             }).catch((error) => {
-              this.error = error;
+              this.error = "This Email is already in use!";
               this.errorFlag = true;
             });
           }
@@ -283,7 +288,7 @@
                 $('#loginModal').modal('hide');
                 location.reload();
               }).catch((error) => {
-              this.error = error;
+              this.error = "Invalid Username or Password Provided";
               this.errorFlag = true;
             });
           }

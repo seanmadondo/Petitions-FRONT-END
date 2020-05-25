@@ -19,7 +19,8 @@
           </a>
         </div>
         <div>
-          <a type="button" href="#Remove" class="btn btn-info btn-lg" data-toggle="modal" data-target="#removePetitionModal"> Remove My Signature </a>
+          <a type="button" href="#Remove" class="btn-danger btn-info btn-lg" data-toggle="modal" data-target="#removeSignModal"
+             v-on:click="removeSignature($route.params.petition_id)"> Remove My Signature </a>
         </div>
         <br /><br />
       </div>
@@ -54,38 +55,49 @@
         </template>
       </div>
 
+      <!-- Modal to confirm removal of signature-->
+      <div id="removeSignModal" class="modal fade" role="dialog">
+        <template>
+          <v-card>
+            <v-card-title class="headline"> NOTICE </v-card-title>
+            <v-card-text> You have successfully removed your signature </v-card-text>
+            <v-card-actions>
+              <v-btn color="green darken-1" onclick="location.reload()"> OK </v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </div>
+
+
       <div class="petitionView">
 
         <table>
-          <tr> <td>Petition Title <br/> {{ onePetition.title }}  </td></tr>
+          <tr> <td> <img style="width:400px" :src="'http://localhost:4941/api/v1/petitions/' + $route.params.petition_id + '/photo'" >   </td></tr>
+          <tr> <td>  <h4>{{ onePetition.title }} </h4>  ({{ onePetition.category }}) </td></tr>
           <v-divider></v-divider>
-          <br/>
-          <tr> <td>Petition Description <br/> {{ onePetition.description }} </td></tr>
+
+          <tr> <td> {{ onePetition.description }} </td></tr>
           <v-divider></v-divider>
-          <br/>
-          <tr> <td>Petition Author <br/>{{ onePetition.authorName }} </td></tr>
+
+          <tr> <td> By <br/>{{ onePetition.authorName }} </td></tr>
           <v-divider></v-divider>
-          <br/>
-          <tr> <td>City <br/>{{ onePetition.authorCity }} </td></tr>
-          <br/>
+
+          <tr> <td> {{ onePetition.authorCity }} {{ onePetition.authorCountry }}</td></tr>
           <v-divider></v-divider>
-          <tr> <td>Country <br/> {{ onePetition.authorCountry }} </td></tr>
-          <br/>
-          <v-divider></v-divider>
+
           <tr> <td>Number of Signatures <br/> {{ onePetition.signatureCount }} </td></tr>
-          <br/>
           <v-divider></v-divider>
-          <tr> <td>Category <br/>{{ onePetition.category }} </td></tr>
-          <br/>
-          <v-divider></v-divider>
+
           <tr> <td>Created Date <br/> {{ onePetition.createdDate }} </td></tr>
-          <br/>
+
           <v-divider></v-divider>
           <tr> <td>Closing Date <br/>{{ onePetition.closingDate }} </td></tr>
-          <br/>
+
           <v-divider></v-divider>
+          <br />
           <!-- TODO: Get the hero image -->
-          <v-list-item-action-text> Signatures </v-list-item-action-text>
+          <v-list-item-action-text> <h4> Signatures </h4> </v-list-item-action-text>
+          <br />
           <v-simple-table>
             <template v-slot:default>
               <thead>
@@ -125,6 +137,7 @@
         errorFlag: false,
         onePetition: [],
         petitionSignatures: [],
+        signedPetitions: []
       }
     },
     mounted: function() {
@@ -159,6 +172,7 @@
         this.$http.post('http://localhost:4941/api/v1/petitions/' + id + '/signatures', {},
           {headers: {'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
           .then((response) => {
+
           })
           .catch((error) => {
             this.error = error;
@@ -173,6 +187,16 @@
           return false;
         }
       },
+       removeSignature: function(id) {
+         this.$http.delete('http://localhost:4941/api/v1/petitions/' + id + '/signatures',
+           {headers: {'X-Authorization': localStorage.getItem("authToken"), 'Content-Type': 'application/json'}})
+           .then((response) => {
+           })
+           .catch((error) => {
+             this.error = error;
+             this.errorFlag = true;
+           });
+       }
 
       // checkSignedPetition: function () {
       //   //function to return true if a user has already signed a petition
