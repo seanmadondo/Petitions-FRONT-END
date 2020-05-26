@@ -3,7 +3,8 @@ import App from './App.vue'
 import Home from './Home.vue';
 import Petitions from './Petitions.vue';
 import Petition from './Petition.vue';
-// import VueCookies from 'vue-cookies';
+import Account from './Account.vue';
+
 import VueImg from 'v-img'
 import VueRouter from 'vue-router';
 import Vuetify from 'vuetify';
@@ -42,6 +43,12 @@ const routes = [
     path: "/petitions",
     name: "petitions",
     component: Petitions
+  },
+
+  {
+    path: "/account",
+    name: "account",
+    component: Account
   }
 ];
 

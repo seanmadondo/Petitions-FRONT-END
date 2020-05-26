@@ -1,165 +1,179 @@
 <template>
-  <div>
-    <div id="home" class="homeData">
 
-      <br/><br/>
+  <v-app>
 
-      <br/><br/>
-      <a>  <td><router-link :to="{ name: 'petitions'}"> Browse Petitions </router-link></td>  </a>
-      <br/><br/>
+    <div>
 
-      <div v-if="checkLoggedIn()===false">
-        <a type="button" href="#register" class="btn btn-primary" data-toggle="modal" data-target="#registerUserModal"> Register </a>
+      <div id="home" class="homeData">
+
+
         <br/><br/>
-        <a type="button" href="#login" class="btn btn-info btn-lg" data-toggle="modal" data-target="#loginModal"> Login </a>
+        <br/><br/>
+
+        <div v-if="checkLoggedIn()===false">
+          <v-btn block rounded href="#register"  color="primary" data-toggle="modal" data-target="#registerUserModal"> Register </v-btn>
+          <br/><br/>
+          <v-divider> </v-divider>
+          <v-btn  href="#login" x-large color="success" data-toggle="modal" data-target="#loginModal"> Login </v-btn>
+        </div>
+
+        <!-- User logout button -->
+        <br/><br/>
+        <div v-if="checkLoggedIn()===true" class="logoutButton">
+          <v-btn block rounded color="primary" v-on:click="logoutUser()"> Logout </v-btn>
+        </div>
+        <br/><br/>
+        <br/><br/>
+
       </div>
 
-      <!-- User logout button -->
-      <br/><br/>
-      <div v-if="checkLoggedIn()===true" class="logoutButton">
-        <a type="button" v-on:click="logoutUser()"> Logout </a>
+      <div>
+        <v-card>
+          <v-system-bar color="indigo darken-3" dark> </v-system-bar>
+
+          <v-card-text>
+            <petitions-import> </petitions-import>
+          </v-card-text>
+
+        </v-card>
+
       </div>
 
-    </div>
+      <!-- LOGIN User Modal -->
+      <div id="loginModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h5 class="modal-title" id="loginUserModalLabel"> Welcome Back, Please Login </h5>
+            </div>
 
-    <!-- LOGIN User Modal -->
-    <div id="loginModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h5 class="modal-title" id="loginUserModalLabel"> Welcome Back, Please Login </h5>
-          </div>
-
-          <div class="modal-body">
-            <!-- Modal content -->
-            <h1>Login</h1>
-            <v-app id="inspire">
-              <v-alert v-if="errorFlag" color="error" icon="warning" value="true">
-                {{error}}
-              </v-alert>
-              <v-form v-on:submit.prevent="loginUserExisting()"
-                      ref="form"
-                      v-model="valid"
-                      lazy-validation
-              >
-                <v-text-field
-                  v-model="email"
-                  label="Email Address"
-                  :rules="emailChecker"
-                  required
-                />
-
-                <v-text-field
-                  v-model="password"
-                  label="Password"
-                  type="password"
-                  required
-                />
-                <v-btn
-                  color="success"
-                  type="submit"
+            <div class="modal-body">
+              <!-- Modal content -->
+              <h1>Login</h1>
+              <v-app id="inspire" style="height: 250px;">
+                <v-alert v-if="errorFlag" color="error" icon="warning" value="true">
+                  {{error}}
+                </v-alert>
+                <v-form v-on:submit.prevent="loginUserExisting()"
+                        ref="form"
+                        v-model="valid"
+                        lazy-validation
                 >
-                  Login
-                </v-btn>
-              </v-form>
-            </v-app>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <v-text-field
+                    v-model="email"
+                    label="Email Address"
+                    :rules="emailChecker"
+                    required
+                  />
+
+                  <v-text-field
+                    v-model="password"
+                    label="Password"
+                    type="password"
+                    required
+                  />
+                  <v-btn
+                    color="success"
+                    type="submit"
+                  >
+                    Login
+                  </v-btn>
+                </v-form>
+              </v-app>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
 
-    <!-- Register Modal -->
-    <div class="modal fade" id="registerUserModal" role="dialog">
-      <div class="modal-dialog">
-        <div v-if="errorFlag" class="alert">
-          <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-          <strong>{{error}}</strong>.
+      <!-- Register Modal -->
+      <div class="modal fade" id="registerUserModal" role="dialog">
+        <div class="modal-dialog">
+          <div v-if="errorFlag" class="alert">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>{{error}}</strong>.
+          </div>
+          <!-- Modal content -->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h5 class="modal-title" id="registerUserModalLabel">Register New Account</h5>
+            </div>
+            <div class="modal-body">
+              <!-- Modal content -->
+              <h1>Register</h1>
+              <v-app style="height: 600px;">
+                <v-alert v-if="errorFlag" color="error" icon="warning" value="true">
+                  {{error}}
+                </v-alert>
+                <v-form v-on:submit.prevent="registerUser()"
+                        ref="form"
+                        v-model="valid"
+                        lazy-validation
+                >
+                  <v-text-field
+                    v-model="firstName"
+                    label="First Name"
+                    required
+                  />
+                  <v-text-field
+                    v-model="lastName"
+                    label="Last Name"
+                    required
+                  />
+                  <v-text-field
+                    v-model="email"
+                    label="Email Address"
+                    :rules="emailChecker"
+                    required
+                  />
+
+                  <v-text-field
+                    v-model="password"
+                    label="Password"
+                    type="password"
+                    required
+                  />
+                  <v-text-field
+                    v-model="retypePassword"
+                    label="Re-type Password"
+                    type="password"
+                    required
+                  />
+
+                  <v-text-field
+                    v-model="city"
+                    label="City (Optional)"
+                  />
+                  <v-text-field
+                    v-model="country"
+                    label="Country (Optional)"
+                  />
+                  <v-btn
+                    color="success"
+                    type="submit"
+                  >
+                    Register
+                  </v-btn>
+                </v-form>
+
+              </v-app>
+
+            </div>
+          </div>
+
         </div>
-        <!-- Modal content -->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h5 class="modal-title" id="registerUserModalLabel">Register New Account</h5>
-          </div>
-          <div class="modal-body">
-            <!-- Modal content -->
-            <h1>Register</h1>
-            <v-app>
-              <v-alert v-if="errorFlag" color="error" icon="warning" value="true">
-                {{error}}
-              </v-alert>
-              <v-form v-on:submit.prevent="registerUser()"
-                      ref="form"
-                      v-model="valid"
-                      lazy-validation
-              >
-                <v-text-field
-                  v-model="firstName"
-                  label="First Name"
-                  required
-                />
-                <v-text-field
-                  v-model="lastName"
-                  label="Last Name"
-                  required
-                />
-                <v-text-field
-                  v-model="email"
-                  label="Email Address"
-                  :rules="emailChecker"
-                  required
-                />
-
-                <v-text-field
-                  v-model="password"
-                  label="Password"
-                  type="password"
-                  required
-                />
-                <v-text-field
-                  v-model="retypePassword"
-                  label="Re-type Password"
-                  type="password"
-                  required
-                />
-
-                <v-text-field
-                  v-model="city"
-                  label="City (Optional)"
-                />
-              <v-text-field
-                v-model="country"
-                label="Country (Optional)"
-              />
-              <v-btn
-                color="success"
-                type="submit"
-              >
-                Register
-              </v-btn>
-              </v-form>
-
-            </v-app>
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-
       </div>
-    </div>
 
-  </div>
+    </div>
+  </v-app>
+
 
 </template>
 
 <script>
+    import Petitions from './Petitions.vue';
     export default {
       data() {
         return {
@@ -182,6 +196,11 @@
           isLoggedIn: false
         }
       },
+
+      components: {
+        'petitions-import':Petitions
+      },
+
       methods: {
         //Register a user and ensure they are logged in
         registerUser: function(){
@@ -288,7 +307,7 @@
                 $('#loginModal').modal('hide');
                 location.reload();
               }).catch((error) => {
-              this.error = "Invalid Username or Password Provided";
+              this.error = "Invalid Email or Password Provided";
               this.errorFlag = true;
             });
           }
@@ -300,7 +319,7 @@
           } else {
             return false;
           }
-        }
+        },
       }
     }
 </script>
